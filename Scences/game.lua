@@ -66,7 +66,7 @@ function love.draw()
     
     -- 画蛇
     for i=1,#snakes do 
-        snakes[1]:draw()
+        snakes[i]:draw()
     end 
 end
 

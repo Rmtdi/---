@@ -3,7 +3,7 @@ require "snake"
 
 function love.load()
 
-    map_width = 25
+    map_width = 29
     map_height = 25
 
     width = 32 * 31

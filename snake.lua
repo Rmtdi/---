@@ -55,6 +55,10 @@ function Snake:update(dt)
         and love.keyboard.isDown("down") then
             table.insert(self.direction, "Down")
         end
+
+        if self.direction[1] == "none" then
+            table.insert(self.face, self.direction[#self.direction])
+        end
             
 
         if love.keyboard.isDown("space") then -- 加速~~
@@ -65,8 +69,8 @@ function Snake:update(dt)
 
         if #self.direction > 1 then -- 保留最新的方向
             for i = #self.direction-1 ,1 ,-1 do
-                table.remove(self.direction, i)
-            end
+                    table.remove(self.direction, i)
+                end
         end
 
         -- 下一坐标以当前蛇头坐标为基准
@@ -79,68 +83,68 @@ function Snake:update(dt)
             if self.direction[1] ~= "none" -- face为左右时direction不能为左右，face为上下时direction不能为上下
             and not( (self.face[#self.face]=="Up" or self.face[#self.face]=="Down") and (self.direction[#self.direction]=="Up" or self.direction[#self.direction]=="Down") )
             and not( (self.face[#self.face]=="Left" or self.face[#self.face]=="Right") and (self.direction[#self.direction]=="Left" or self.direction[#self.direction]=="Right") ) then
+                nextX,nextY = self:Move(self.direction, nowX, nowY)
                 
+                --self:isCollision(self.direction, nextX, nextY)
+
+                table.insert(self.face,self.direction[#self.direction]) -- 确认移动方向，将face更改为当前direction
+
+            elseif self.face[#self.face] == self.direction[#self.direction] then
                 nextX,nextY = self:Move(self.direction, nowX, nowY)
-                table.insert(self.face,self.direction[#self.direction])
 
-            elseif self.direction[1] ~= "none" then
-
-                nextX,nextY = self:Move(self.direction, nowX, nowY)
-
+                --self:isCollision(self.direction, nextX, nextY)
+            else
+                nextX,nextY = self:Move(self.face, nowX, nowY)
             end
+            table.insert(self.body, 1, {x = nextX, y = nextY}) 
         end
 
-        for i, pair in ipairs(self.body) do
-            if i ~= 1
-            and X == pair.x 
-            and Y == pair.y then
-                self.canMove = false 
-            end
-        end
+        
 
         -- 判断碰撞
-        for index, pair in ipairs(self.body) do 
-            if self.direction[1] ~= "none"
-            and index ~= 1 
-            and nextX == pair.x 
-            and nextY == pair.y then 
-                while love.timer.getTime() - self.move_timer <= 0.5 do 
-                    if (self.face[#self.face]=="Up" or self.face[#self.face]=="Down") 
-                    and (love.keyboard.isDown("Left")) then
-                        table.insert(self.direction, "Left")
+        -- for index, pair in ipairs(self.body) do 
+        --     if self.direction[1] ~= "none"
+        --     and index ~= 1 
+        --     and nextX == pair.x 
+        --     and nextY == pair.y then 
+        --         -- while love.timer.getTime() - self.move_timer <= 0.5 do 
+        --         --     if (self.face[#self.face]=="Up" or self.face[#self.face]=="Down") 
+        --         --     and (love.keyboard.isDown("Left")) then
+        --         --         table.insert(self.direction, "Left")
 
-                    elseif (self.face[#self.face]=="Up" or self.face[#self.face]=="Down") 
-                    and (love.keyboard.isDown("Right")) then
-                        table.insert(self.direction, "Right")
+        --         --     elseif (self.face[#self.face]=="Up" or self.face[#self.face]=="Down") 
+        --         --     and (love.keyboard.isDown("Right")) then
+        --         --         table.insert(self.direction, "Right")
 
-                    elseif(self.face[#self.face]=="Left" or self.face[#self.face]=="Down") 
-                    and (love.keyboard.isDown("Up")) then
-                        table.insert(self.direction, "Up")
-                    elseif(self.face[#self.face]=="Left" or self.face[#self.face]=="Down") 
-                    and (love.keyboard.isDown("Down")) then
-                        table.insert(self.direction, "Down")
-                    end
-                    local nX,nY = self:Move(self.direction, nowX, nowY)
+        --         --     elseif(self.face[#self.face]=="Left" or self.face[#self.face]=="Down") 
+        --         --     and (love.keyboard.isDown("Up")) then
+        --         --         table.insert(self.direction, "Up")
+        --         --     elseif(self.face[#self.face]=="Left" or self.face[#self.face]=="Down") 
+        --         --     and (love.keyboard.isDown("Down")) then
+        --         --         table.insert(self.direction, "Down")
+        --         --     end
+        --         --     local nX,nY = self:Move(self.direction, nowX, nowY)
                     
-                    for index, pair in ipairs(self.body) do 
-                        if index ~= 1 
-                        and nX == pair.x 
-                        and nY == pair.y then
-                            self.canMove = false 
-                        elseif nX ~= pair.x 
-                        and nY ~= pair.y then
-                            self.canMove = true
-                            nextX=nX
-                            nextY=nY
-                            break
-                        end
-                    end
-                end
-                self.move_timer = love.timer.getTime()
-            else
-                table.insert(self.body, 1, {x = nextX, y = nextY}) -- 在蛇头要移动地方向生成蛇头
-            end
-        end
+        --         --     for index, pair in ipairs(self.body) do 
+        --         --         if index ~= 1 
+        --         --         and nX == pair.x 
+        --         --         and nY == pair.y then
+        --         --             self.canMove = false 
+        --         --         elseif nX ~= pair.x 
+        --         --         and nY ~= pair.y then
+        --         --             self.canMove = true
+        --         --             nextX=nX
+        --         --             nextY=nY
+        --         --             break
+        --         --         end
+        --         --     end
+        --         -- end
+        --         self.canMove = false
+        --         self.move_timer = love.timer.getTime()
+        --     else
+        --         table.insert(self.body, 1, {x = nextX, y = nextY}) -- 在蛇头要移动地方向生成蛇头
+        --     end
+        -- end
         
 
         
@@ -191,6 +195,7 @@ function Snake:draw()
     for i=1,#self.direction do
         love.graphics.print("Direction: "..self.direction[i],10,i*10)
     end
+    love.graphics.print("Face: "..self.face[#self.face],150,10)
     love.graphics.print("speed: "..self.speed,10,30)
     love.graphics.print("speed: "..self.face[#self.face],10,50)
     love.graphics.print("length: "..self.length.." score: "..scores[self.sn].snake,10,70)
@@ -198,7 +203,7 @@ end
 
 
 
-function Snake:Move(direction, X, Y) -- 蛇移动函数 
+function Snake:Move(direction, X, Y) -- 计算蛇下一步移动在哪的函数 
     if direction[#direction] == "Left" then 
         if X - 1 == 0 then
             X = map_width
@@ -225,4 +230,14 @@ function Snake:Move(direction, X, Y) -- 蛇移动函数
         end
     end
     return X,Y
+end
+
+function Snake:isCollision(derction,X,Y)
+    for i, pair in ipairs(self.body) do
+        if i ~= 1
+        and X == pair.x 
+        and Y == pair.y then
+            self.canMove = false 
+        end 
+    end
 end
